@@ -1,0 +1,13 @@
+managedbeans\CorrelationController$CorrelationControllerConverter.class
+managedbeans\RatingController.class
+managedbeans\util\JsfUtil$PersistAction.class
+managedbeans\UserController$UserControllerConverter.class
+managedbeans\PredictionController.class
+managedbeans\VenueController$VenueControllerConverter.class
+managedbeans\UserController.class
+managedbeans\RatingController$RatingControllerConverter.class
+managedbeans\CorrelationController.class
+managedbeans\VenueController.class
+managedbeans\util\ItemPrediction.class
+managedbeans\util\JsfUtil.class
+managedbeans\util\SortPredictionByRating.class

@@ -1,0 +1,17 @@
+sessionbeans\AbstractFacade.class
+entities\Correlation.class
+entities\Venue.class
+sessionbeans\VenueFacadeLocal.class
+entities\User_.class
+sessionbeans\VenueFacade.class
+sessionbeans\UserFacade.class
+sessionbeans\RatingFacadeLocal.class
+entities\Rating.class
+entities\Correlation_.class
+sessionbeans\UserFacadeLocal.class
+sessionbeans\CorrelationFacade.class
+sessionbeans\RatingFacade.class
+entities\Rating_.class
+entities\User.class
+sessionbeans\CorrelationFacadeLocal.class
+entities\Venue_.class
