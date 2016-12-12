@@ -57,7 +57,12 @@ public class RatingFacade extends AbstractFacade<Rating> implements RatingFacade
                 return 0;
             }
             */
-            return (double) query.getSingleResult();
+            if(query.getSingleResult() != null){
+                return (double) query.getSingleResult();
+            }
+            else{
+                return -1;
+            }
         }
         catch(NoResultException e){
             return -1;

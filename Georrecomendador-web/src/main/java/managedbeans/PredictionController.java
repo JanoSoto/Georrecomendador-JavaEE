@@ -11,7 +11,9 @@ import entities.Venue;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
@@ -43,8 +45,8 @@ public class PredictionController implements Serializable {
     private List<ItemPrediction> topKPredictions = null;
     private List<ItemPrediction> allPredictions;
 
-    private int r_inner;
-    private int r_outer;
+    private int r_inner = 100;
+    private int r_outer = 1000;
     
     public PredictionController(){
         
@@ -76,12 +78,22 @@ public class PredictionController implements Serializable {
     
     
     
-    public List<ItemPrediction> getTopKItems(int k, User user){
-        List<ItemPrediction> topK = new ArrayList();
+    public void getTopKItems(int k, User user){
+        topKPredictions = new ArrayList();
+        long timeStart = System.currentTimeMillis();
         
         double avgRatingUser = ejbRating.getAverageRatingByUser(user.getId());
         List<Correlation> vecindario = ejbCorrelation.getNeighborhood(user.getId(), 20);
         double avgCorrelation = getCorrelationAverage(vecindario);
+        Map<Long, Double> avgVecindario = new HashMap<>();
+        for(Correlation vecino : vecindario){
+            if(avgVecindario.get(vecino.getUser1().getId()) == null){
+                avgVecindario.put(vecino.getUser1().getId(), ejbRating.getAverageRatingByUser(vecino.getUser1().getId()));
+            }
+            if(avgVecindario.get(vecino.getUser2().getId()) == null){
+                avgVecindario.put(vecino.getUser2().getId(), ejbRating.getAverageRatingByUser(vecino.getUser2().getId()));
+            }
+        }
         allPredictions = new ArrayList();
         
         List<Venue> allVenues = ejbVenue.getFirstNVenues(1000);
@@ -91,14 +103,14 @@ public class PredictionController implements Serializable {
             System.out.println("Venue "+venue.getId());
             double sumaVecindario = 0;
             for(Correlation vecino : vecindario){
-                double usersCorrelation = 0;
+                double usersCorrelation;
                 if(!Objects.equals(user.getId(), vecino.getUser1().getId())){
                     if((usersCorrelation = ejbCorrelation.getCorrelationByUsers(user.getId(), vecino.getUser1().getId())) == -1){
                         usersCorrelation = ejbCorrelation.getCorrelationByUsers(vecino.getUser1().getId(), user.getId());
                     }
                     ratingUserVenue = ejbRating.getRatingByUserAndVenue(vecino.getUser1().getId(), venue.getId());
                     if(ratingUserVenue != -1){
-                        sumaVecindario += (ratingUserVenue - ejbRating.getAverageRatingByUser(vecino.getUser1().getId())) * usersCorrelation;   
+                        sumaVecindario += (ratingUserVenue - avgVecindario.get(vecino.getUser1().getId())) * usersCorrelation;   
                     }
                 }
                 else {
@@ -107,7 +119,7 @@ public class PredictionController implements Serializable {
                     }
                     ratingUserVenue = ejbRating.getRatingByUserAndVenue(vecino.getUser2().getId(), venue.getId());
                     if(ratingUserVenue != -1){
-                        sumaVecindario += (ratingUserVenue - ejbRating.getAverageRatingByUser(vecino.getUser1().getId())) * usersCorrelation;   
+                        sumaVecindario += (ratingUserVenue - avgVecindario.get(vecino.getUser2().getId())) * usersCorrelation;   
                     }
                 }
             }
@@ -117,14 +129,13 @@ public class PredictionController implements Serializable {
         //allPredictions.sort(new SortPredictionByRating());
         Collections.sort(allPredictions, new SortPredictionByRating());
         
-        return allPredictions;
-        /*
+        System.out.println("TIEMPO TOTAL: " + (System.currentTimeMillis() - timeStart) + "ms");
+        
         for(int i=0; i<k; i++){
-            topK.add(allPredictions.get(i));
+            topKPredictions.add(allPredictions.get(i));
         }
         System.out.println("PROCESO TERMINADO");
-        return topK;
-        */
+        
     }
     
     public double getCorrelationAverage(List<Correlation> vecindario){
@@ -137,9 +148,11 @@ public class PredictionController implements Serializable {
         return suma/vecindario.size();
     }
     
+    /*
     public void getTopK(int k, User user){
         topKPredictions = getTopKItems(k, user);
     }
+    */
     
     /**
      * Implementación de lo propuesto en Mobile 3D-Gis

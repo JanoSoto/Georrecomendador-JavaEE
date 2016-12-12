@@ -24,7 +24,7 @@
                                  rowsPerPageTemplate="10,20,30,40,50"
                                  >
 
-                        <p:column>
+                        <p:column filterBy="#{item.id}" filterMatchMode="contains">
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListUserTitle_id}"/>
                             </f:facet>
@@ -44,7 +44,7 @@
                         </p:column>                        
                         
                         <f:facet name="footer">
-                            <p:commandButton id="calcularCF"  value="Calcular predicciones CF" actionListener="#{predictionController.getTopK(20, userController.selected)}" update=":predictionsTable"/>
+                            <p:commandButton id="calcularCF"  value="Calcular predicciones CF" actionListener="#{predictionController.getTopKItems(20, userController.selected)}" update=":predictionsTable"/>
                             
                             <h:outputLabel for="inner" value="Radio interior (m): " />
                             <p:spinner id="inner" value="#{predictionController.r_inner}" min="15" />
@@ -52,7 +52,7 @@
                             <h:outputLabel for="outer" value="Radio exterior (m): " />
                             <p:spinner id="outer" value="#{predictionController.r_outer}" min="#{predictionController.r_inner+10}"/>
                             
-                            <p:commandButton id="calcularRR"  value="Calcular predicciones CF" actionListener="#{predictionController.reRankFromDistance(userController.selected, 1000)}" update=":predictionsTable"/>
+                            <p:commandButton id="calcularRR"  value="Re-Rankear" actionListener="#{predictionController.reRankFromDistance(userController.selected, 1000)}" update=":predictionsTable"/>
                             
                         </f:facet>
                     </p:dataTable>
